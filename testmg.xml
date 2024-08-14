@@ -4,7 +4,8 @@
 <test name = "Login Test">
 <classes>
     <class name="Regression.testLogIn"/>
-    <class name="Regression.testPurchase"/>
+<!--    <class name="Regression.testPurchase"/>-->
+    <class name="Regression.liveTest"/>
 </classes>
 </test>
 </suite>
