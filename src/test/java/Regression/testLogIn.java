@@ -25,7 +25,6 @@ public class testLogIn extends Globals {
         } catch (Exception e) {
             test.fail("User was not able to login" + e);
              throw new RuntimeException("Failed to perform login", e);
-
         }
     }
 
