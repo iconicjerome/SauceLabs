@@ -5,20 +5,52 @@ import com.aventstack.extentreports.reporter.ExtentSparkReporter;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.edge.EdgeDriver;
+import org.openqa.selenium.firefox.FirefoxDriver;
 import org.testng.annotations.AfterSuite;
 import org.testng.annotations.BeforeSuite;
 
 
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Properties;
 
 public class Globals {
     public static WebDriver driver;
     public static ExtentReports extent;
+    public static Properties properties;
+    //Create method to access application.properties file
+    public  static  void loadProperties(){
+        properties = new Properties();
+        try {
+            FileInputStream fis = new FileInputStream("resources/application.properties");
+            properties.load(fis);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+    //Create Method to get properties
+    public static String getProperties(String key){
+        if(properties==null){
+            loadProperties();
+        }
+        return properties.getProperty(key);
+    }
     @BeforeSuite
     //start Browser
     public static WebDriver startBrowser(){
-        driver = new EdgeDriver();
+        String browser = getProperties("browser");
+        if(browser.equalsIgnoreCase("chrome")){
+            driver = new ChromeDriver();
+        }else if (browser.equalsIgnoreCase("edge")){
+            driver = new EdgeDriver();
+        }else if (browser.equalsIgnoreCase("'firefox'")){
+            driver = new FirefoxDriver();
+        }
         driver.manage().window().maximize();
         driver.get("https://www.saucedemo.com/");
         return driver;
@@ -26,8 +58,13 @@ public class Globals {
     @BeforeSuite
     //create Report
     public  static ExtentReports createReport(){
+        //Add date and time to extent report;
+        //use this format "dd-mm-yyyy_hh-mm-ss" to prevent the java.nio.file.InvalidPathException: Illegal char exception
+        DateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy_HH-mm-ss");
+        Date date = new Date();
+        String newDate = dateFormat.format(date);
         extent = new ExtentReports();
-        ExtentSparkReporter spark = new ExtentSparkReporter("Reports/extent.html");
+        ExtentSparkReporter spark = new ExtentSparkReporter("Reports/Report-"+newDate+".html");
         spark.config().setDocumentTitle("SauceDemo Test");
         extent.attachReporter(spark);
         return extent;
